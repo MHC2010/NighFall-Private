@@ -1,176 +1,89 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
--- Create the Rayfield Window
 local Window = Rayfield:CreateWindow({
-    Name = "NightFall Hub",
-    Icon = 0, -- No icon in the topbar
-    LoadingTitle = "NightFall",
-    LoadingSubtitle = "by MHC201",
-    Theme = "Default", -- Default theme for the window
+   Name = "NightFall Hub",
+   Icon = 0, -- Icon in Topbar. Can use Lucide Icons (string) or Roblox Image (number). 0 to use no icon (default).
+   LoadingTitle = "NightFall",
+   LoadingSubtitle = "by MHC201",
+   Theme = "Default", -- Check https://docs.sirius.menu/rayfield/configuration/themes
 
-    DisableRayfieldPrompts = false,
-    DisableBuildWarnings = false, -- Prevent version mismatch warnings
+   DisableRayfieldPrompts = false,
+   DisableBuildWarnings = false, -- Prevents Rayfield from warning when the script has a version mismatch with the interface
 
-    ConfigurationSaving = {
-        Enabled = true,
-        FolderName = nil, -- Custom folder name for saving the configuration
-        FileName = "Big Hub"
-    },
+   ConfigurationSaving = {
+      Enabled = true,
+      FolderName = nil, -- Create a custom folder for your hub/game
+      FileName = "Big Hub"
+   },
 
-    Discord = {
-        Enabled = true, -- Prompt user to join the Discord server
-        Invite = "NauJg2aT", -- Discord invite code
-        RememberJoins = true -- Remember the user's Discord join status
-    },
+   Discord = {
+      Enabled = true, -- Prompt the user to join your Discord server if their executor supports it
+      Invite = "https://discord.gg/NauJg2aT", -- The Discord invite code, do not include discord.gg/. E.g. discord.gg/ABCD would be ABCD
+      RememberJoins = true -- Set this to false to make them join the discord every time they load it up
+   },
 
-    KeySystem = true, -- Enable key system for access control
-    KeySettings = {
-        Title = "Booga | key",
-        Subtitle = "Key in discord server",
-        Note = "Join server", -- Instructions for how to obtain a key
-        FileName = "NIGHTFALL KEY", -- Unique file name for key saving
-        SaveKey = true, -- Save the user's key
-        GrabKeyFromSite = true, -- Fetch the key from the specified link
-        Key = {"https://pastebin.com/raw/wZS2224n"} -- Link to the raw key file (or simple key strings)
-    }
+   KeySystem = true, -- Set this to true to use our key system
+   KeySettings = {
+      Title = "Booga | key",
+      Subtitle = "Key in discord server",
+      Note = "Join server", -- Use this to tell the user how to get a key
+      FileName = "NIGHTFALL KEY", -- It is recommended to use something unique as other scripts using Rayfield may overwrite your key file
+      SaveKey = true, -- The user's key will be saved, but if you change the key, they will be unable to use your script
+      GrabKeyFromSite = true, -- If this is true, set Key below to the RAW site you would like Rayfield to get the key from
+      Key = {"https://pastebin.com/raw/wZS2224n"} -- List of keys that will be accepted by the system, can be RAW file links (pastebin, github etc) or simple strings ("hello","key22")
+   }
 })
 
--- Create the Home Tab
-local MainTab = Window:CreateTab("🏠Home", nil)
-
--- Create a section within the Home tab
+local MainTab = Window:CreateTab("🏠Home", nil) -- Title, Image
 local MainSection = MainTab:CreateSection("Main")
 
--- Infinite Jump logic
-local canJump = false
-local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
-
-local function toggleJump()
-    canJump = not canJump
-    if canJump then
-        print("Infinite Jump ON")
-    else
-        print("Infinite Jump OFF")
-    end
-end
-
-local function onJumpRequest()
-    if canJump and humanoid:GetState() == Enum.HumanoidStateType.Physics then
-        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-        humanoid:Move(Vector3.new(0, 50, 0))  -- This will give the jump force
-    end
-end
-
--- Add Infinite Jump Button
-MainTab:CreateButton({
-    Name = "Infinite Jump",
-    Callback = function()
-        toggleJump()
-    end
-})
-
--- Fly logic
-local flying = false
-local bodyVelocity
-
-local function toggleFly()
-    flying = not flying
-    local character = game.Players.LocalPlayer.Character
-    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-
-    if flying then
-        -- Start flying
-        bodyVelocity = Instance.new("BodyVelocity")
-        bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
-        bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Initial upward force
-        bodyVelocity.Parent = humanoidRootPart
-
-        -- Enable controls for movement
-        game:GetService("UserInputService").InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.Keyboard then
-                if input.KeyCode == Enum.KeyCode.Space then
-                    bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Moving upwards
-                elseif input.KeyCode == Enum.KeyCode.W then
-                    bodyVelocity.Velocity = Vector3.new(0, 50, -50)  -- Forward
-                elseif input.KeyCode == Enum.KeyCode.S then
-                    bodyVelocity.Velocity = Vector3.new(0, 50, 50)  -- Backward
-                elseif input.KeyCode == Enum.KeyCode.A then
-                    bodyVelocity.Velocity = Vector3.new(-50, 50, 0)  -- Left
-                elseif input.KeyCode == Enum.KeyCode.D then
-                    bodyVelocity.Velocity = Vector3.new(50, 50, 0)  -- Right
-                end
-            end
-        end)
-        print("Flying ON")
-    else
-        -- Stop flying
-        if bodyVelocity then
-            bodyVelocity:Destroy()
-        end
-        print("Flying OFF")
-    end
-end
-
--- Add Fly Button
-MainTab:CreateButton({
-    Name = "Fly",
-    Callback = function()
-        toggleFly()
-    end
-})
-
--- Speed Slider
-local speedSlider = MainTab:CreateSlider({
-    Name = "Set Speed",
-    Range = {16, 200}, -- Range of speed values (default walk speed is 16)
-    Increment = 1, -- Step increment
-    Default = 16, -- Default speed
-    Callback = function(value)
-        humanoid.WalkSpeed = value
-    end
-})
-
--- Kick Player Feature
-MainTab:CreateSection("Admin Features")
-
-local playerTextbox = MainTab:CreateTextBox({
-    Name = "Enter Username to Kick",
-    Text = "",
-    PlaceholderText = "Username",
-    Callback = function(username)
-        -- Kick player with the specified username
-        local targetPlayer = game.Players:FindFirstChild(username)
-        if targetPlayer then
-            targetPlayer:Kick("Kicked by admin")
-            print("Player " .. username .. " has been kicked.")
-        else
-            print("Player not found.")
-        end
-    end
-})
-
--- Add Kick Button to execute kick
-MainTab:CreateButton({
-    Name = "Kick Player",
-    Callback = function()
-        local username = playerTextbox.Text
-        local targetPlayer = game.Players:FindFirstChild(username)
-        if targetPlayer then
-            targetPlayer:Kick("Kicked by admin")
-            print("Player " .. username .. " has been kicked.")
-        else
-            print("Player not found.")
-        end
-    end
-})
-
--- Notify the user once the GUI has been loaded
 Rayfield:Notify({
-    Title = "Injection complete",
-    Content = "NightFall GUI",
-    Duration = 4.5, -- Notification duration in seconds
-    Image = nil, -- No image in the notification
+   Title = "Injection complete",
+   Content = "NightFall gui",
+   Duration = 4.5,
+   Image = nil,
 })
 
--- Connect the JumpRequest event to trigger infinite jump
-game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Jumping:Connect(onJumpRequest)
+local Button = MainTab:CreateButton({
+   Name = "Infinite jump",
+   Callback = function()
+      print("Infinite jump button pressed")  -- Debug print to track if button is working
+
+      -- Toggles the infinite jump between on or off on every script run
+      G.infinjump = not G.infinjump
+      print("Infinite jump toggled:", G.infinjump)  -- Debug print to check toggle state
+
+      if G.infinJumpStarted == nil then
+         -- Ensures this only runs once to save resources
+         G.infinJumpStarted = true
+         -- Notifies readiness
+         game.StarterGui:SetCore("SendNotification", {
+            Title = "Youtube Hub", 
+            Text = "Infinite Jump Activated!", 
+            Duration = 5
+         })
+         
+         -- Actual infinite jump logic
+         local plr = game:GetService('Players').LocalPlayer
+         local m = plr:GetMouse()
+
+         -- Connect the event to detect key presses
+         m.KeyDown:Connect(function(k) -- Corrected connect to Connect
+            print("Key pressed:", k)  -- Debug print to track which key was pressed
+            if G.infinjump then
+               if k:byte() == 32 then -- Space bar key
+                  print("Space key pressed, jumping")  -- Debug print when space is pressed
+                  local humanoid = plr.Character:FindFirstChildOfClass('Humanoid')
+                  if humanoid then
+                     humanoid:ChangeState('Jumping')
+                     wait() -- brief wait
+                     humanoid:ChangeState('Seated')
+                  end
+               end
+            end
+         end)
+      else
+         print("Infinite Jump already started")  -- Debug print when the jump is already started
+      end
+   end,
+})
