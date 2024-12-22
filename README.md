@@ -41,10 +41,10 @@ local MainTab = Window:CreateTab("🏠Home", nil)
 -- Create a section within the Home tab
 local MainSection = MainTab:CreateSection("Main")
 
--- Variable to manage Infinite Jump
+-- Infinite Jump logic
 local canJump = false
+local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
 
--- Function to toggle Infinite Jump
 local function toggleJump()
     canJump = not canJump
     if canJump then
@@ -54,14 +54,10 @@ local function toggleJump()
     end
 end
 
--- Handle Infinite Jump
 local function onJumpRequest()
-    if canJump then
-        local humanoid = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-        if humanoid then
-            humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-            humanoid:Move(Vector3.new(0, 50, 0)) -- Adjust the jump force as needed
-        end
+    if canJump and humanoid:GetState() == Enum.HumanoidStateType.Physics then
+        humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        humanoid:Move(Vector3.new(0, 50, 0))  -- This will give the jump force
     end
 end
 
@@ -73,23 +69,38 @@ MainTab:CreateButton({
     end
 })
 
--- Handle Fly
+-- Fly logic
 local flying = false
 local bodyVelocity
-local character = game.Players.LocalPlayer.Character
 
--- Function to toggle Fly
 local function toggleFly()
     flying = not flying
-    character = game.Players.LocalPlayer.Character
-    local humanoid = character:FindFirstChild("Humanoid")
-    
+    local character = game.Players.LocalPlayer.Character
+    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+
     if flying then
         -- Start flying
         bodyVelocity = Instance.new("BodyVelocity")
         bodyVelocity.MaxForce = Vector3.new(100000, 100000, 100000)
-        bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Adjust fly speed
-        bodyVelocity.Parent = character:FindFirstChild("HumanoidRootPart")
+        bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Initial upward force
+        bodyVelocity.Parent = humanoidRootPart
+
+        -- Enable controls for movement
+        game:GetService("UserInputService").InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                if input.KeyCode == Enum.KeyCode.Space then
+                    bodyVelocity.Velocity = Vector3.new(0, 50, 0)  -- Moving upwards
+                elseif input.KeyCode == Enum.KeyCode.W then
+                    bodyVelocity.Velocity = Vector3.new(0, 50, -50)  -- Forward
+                elseif input.KeyCode == Enum.KeyCode.S then
+                    bodyVelocity.Velocity = Vector3.new(0, 50, 50)  -- Backward
+                elseif input.KeyCode == Enum.KeyCode.A then
+                    bodyVelocity.Velocity = Vector3.new(-50, 50, 0)  -- Left
+                elseif input.KeyCode == Enum.KeyCode.D then
+                    bodyVelocity.Velocity = Vector3.new(50, 50, 0)  -- Right
+                end
+            end
+        end)
         print("Flying ON")
     else
         -- Stop flying
@@ -108,21 +119,18 @@ MainTab:CreateButton({
     end
 })
 
--- Speed Slider (Set Speed)
+-- Speed Slider
 local speedSlider = MainTab:CreateSlider({
     Name = "Set Speed",
     Range = {16, 200}, -- Range of speed values (default walk speed is 16)
     Increment = 1, -- Step increment
     Default = 16, -- Default speed
     Callback = function(value)
-        local humanoid = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid")
-        if humanoid then
-            humanoid.WalkSpeed = value
-        end
+        humanoid.WalkSpeed = value
     end
 })
 
--- Add Kick Player Feature
+-- Kick Player Feature
 MainTab:CreateSection("Admin Features")
 
 local playerTextbox = MainTab:CreateTextBox({
@@ -131,6 +139,21 @@ local playerTextbox = MainTab:CreateTextBox({
     PlaceholderText = "Username",
     Callback = function(username)
         -- Kick player with the specified username
+        local targetPlayer = game.Players:FindFirstChild(username)
+        if targetPlayer then
+            targetPlayer:Kick("Kicked by admin")
+            print("Player " .. username .. " has been kicked.")
+        else
+            print("Player not found.")
+        end
+    end
+})
+
+-- Add Kick Button to execute kick
+MainTab:CreateButton({
+    Name = "Kick Player",
+    Callback = function()
+        local username = playerTextbox.Text
         local targetPlayer = game.Players:FindFirstChild(username)
         if targetPlayer then
             targetPlayer:Kick("Kicked by admin")
@@ -151,4 +174,3 @@ Rayfield:Notify({
 
 -- Connect the JumpRequest event to trigger infinite jump
 game.Players.LocalPlayer.Character:WaitForChild("Humanoid").Jumping:Connect(onJumpRequest)
-
