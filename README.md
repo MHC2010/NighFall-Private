@@ -51,23 +51,23 @@ local Button = MainTab:CreateButton({
         -- Toggles the infinite jump between on or off on every script run
         _G.infinjump = not _G.infinjump
 
-        if _G.infinjump and _G.infinJumpStarted == nil then
+   if _G.infinjump and _G.infinJumpStarted == nil then
             -- Ensures this only runs once to save resources
             _G.infinJumpStarted = true
             
-            -- Notifies readiness
+   -- Notifies readiness
             game.StarterGui:SetCore("SendNotification", {
                 Title = "Youtube Hub", 
                 Text = "Infinite Jump Activated!", 
                 Duration = 5
             })
 
-            -- The actual infinite jump
+   -- The actual infinite jump
             local plr = game:GetService('Players').LocalPlayer
             local UIS = game:GetService("UserInputService")  -- Using UserInputService for better key handling
             local humanoid = plr.Character:WaitForChild('Humanoid')
 
-            -- KeyDown Event Handling
+ -- KeyDown Event Handling
             UIS.InputBegan:Connect(function(input, gameProcessedEvent)
                 if gameProcessedEvent then return end
                 if _G.infinjump and input.KeyCode == Enum.KeyCode.Space then
