@@ -35,7 +35,7 @@ local Window = Rayfield:CreateWindow({
 })
 
 local MainTab = Window:CreateTab("🏠Home", nil) -- Title, Image
-local MainSection = MainTab:CreateSection("Main")
+local MainSection = MainTabTab:CreateSection("Main")
 
 Rayfield:Notify({
    Title = "Injection complete",
@@ -44,46 +44,117 @@ Rayfield:Notify({
    Image = nil,
 })
 
+-- Infinite Jump Toggle Button
 local Button = MainTab:CreateButton({
-   Name = "Infinite jump",
-   Callback = function()
-      print("Infinite jump button pressed")  -- Debug print to track if button is working
+    Name = "Infinite Jump Toggle",
+    Callback = function()
+        -- Toggles the infinite jump between on or off on every script run
+        _G.infinjump = not _G.infinjump
 
-      -- Toggles the infinite jump between on or off on every script run
-      G.infinjump = not G.infinjump
-      print("Infinite jump toggled:", G.infinjump)  -- Debug print to check toggle state
+        if _G.infinjump and _G.infinJumpStarted == nil then
+            -- Ensures this only runs once to save resources
+            _G.infinJumpStarted = true
+            
+            -- Notifies readiness
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Youtube Hub", 
+                Text = "Infinite Jump Activated!", 
+                Duration = 5
+            })
 
-      if G.infinJumpStarted == nil then
-         -- Ensures this only runs once to save resources
-         G.infinJumpStarted = true
-         -- Notifies readiness
-         game.StarterGui:SetCore("SendNotification", {
-            Title = "Youtube Hub", 
-            Text = "Infinite Jump Activated!", 
-            Duration = 5
-         })
-         
-         -- Actual infinite jump logic
-         local plr = game:GetService('Players').LocalPlayer
-         local m = plr:GetMouse()
+            -- The actual infinite jump
+            local plr = game:GetService('Players').LocalPlayer
+            local UIS = game:GetService("UserInputService")  -- Using UserInputService for better key handling
+            local humanoid = plr.Character:WaitForChild('Humanoid')
 
-         -- Connect the event to detect key presses
-         m.KeyDown:Connect(function(k) -- Corrected connect to Connect
-            print("Key pressed:", k)  -- Debug print to track which key was pressed
-            if G.infinjump then
-               if k:byte() == 32 then -- Space bar key
-                  print("Space key pressed, jumping")  -- Debug print when space is pressed
-                  local humanoid = plr.Character:FindFirstChildOfClass('Humanoid')
-                  if humanoid then
-                     humanoid:ChangeState('Jumping')
-                     wait() -- brief wait
-                     humanoid:ChangeState('Seated')
-                  end
-               end
-            end
-         end)
-      else
-         print("Infinite Jump already started")  -- Debug print when the jump is already started
-      end
-   end,
+            -- KeyDown Event Handling
+            UIS.InputBegan:Connect(function(input, gameProcessedEvent)
+                if gameProcessedEvent then return end
+                if _G.infinjump and input.KeyCode == Enum.KeyCode.Space then
+                    humanoid:ChangeState('Jumping')
+                    wait()
+                    humanoid:ChangeState('Seated')
+                end
+            end)
+        end
+    end,
 })
+
+-- WalkSpeed Slider
+local WalkSpeedSlider = MainTab:CreateSlider({
+    Name = "WalkSpeed Slider",
+    Range = {1, 350},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,
+    Flag = "sliderws",
+    Callback = function(Value)
+        local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+        humanoid.WalkSpeed = Value
+    end,
+})
+
+-- JumpPower Slider
+local JumpPowerSlider = MainTab:CreateSlider({
+    Name = "JumpPower Slider",
+    Range = {1, 350},
+    Increment = 1,
+    Suffix = "JumpPower",
+    CurrentValue = 16,
+    Flag = "sliderjp",
+    Callback = function(Value)
+        local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+        humanoid.JumpPower = Value
+    end,
+})
+
+-- WalkSpeed Input
+local WalkSpeedInput = MainTab:CreateInput({
+    Name = "Walkspeed",
+    PlaceholderText = "1-500",
+    RemoveTextAfterFocusLost = true,
+    Callback = function(Text)
+        local humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")
+        humanoid.WalkSpeed = tonumber(Text) or 16  -- Default to 16 if invalid input
+    end,
+})
+
+-- Auto Farm Toggle
+local Toggle = MainTab:CreateToggle({
+    Name = "Auto Farm",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        print("FARMING")
+    end,
+})
+
+-- Teleports Tab
+local TPTab = Window:CreateTab("🏝 Teleports", nil)
+
+local Button1 = TPTab:CreateButton({
+    Name = "Starter Island",
+    Callback = function()
+        -- Example teleportation
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.StarterIsland.CFrame
+    end,
+})
+
+local Button2 = TPTab:CreateButton({
+    Name = "Pirate Island",
+    Callback = function()
+        -- Example teleportation
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.PirateIsland.CFrame
+    end,
+})
+
+local Button3 = TPTab:CreateButton({
+    Name = "Pineapple Paradise",
+    Callback = function()
+        -- Example teleportation
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = workspace.PineappleParadise.CFrame
+    end,
+})
+
+-- Miscellaneous Tab
+local MiscTab = Window:CreateTab("🎲 Misc", nil)
