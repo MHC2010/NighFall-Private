@@ -1,4 +1,4 @@
-local Rayfield = loadstring(game:HttpGet('https://[Log in to view URL]'))()
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/SiriusMenu/rayfield/main/Source'))()
 
 local Window = Rayfield:CreateWindow({
    Name = "NightFall Hub",
@@ -18,7 +18,7 @@ local Window = Rayfield:CreateWindow({
 
    Discord = {
       Enabled = true,
-      Invite = "NauJg2aT",
+      Invite = "NauJg2aT",  -- Correct Discord Invite
       RememberJoins = true
    },
 
@@ -30,7 +30,7 @@ local Window = Rayfield:CreateWindow({
       FileName = "NIGHTFALL_KEY",
       SaveKey = true,
       GrabKeyFromSite = true,
-      Key = {"https://[Log in to view URL]"}
+      Key = {"https://pastebin.com/raw/wZS2224n"}  -- Correct Key URL
    },
 
    CustomTheme = {
@@ -132,7 +132,6 @@ end)
 
 -- Initial update
 updatePlayerList()
-
 
 -- Speed and Jump Boost Toggle
 local speed = 50
@@ -275,4 +274,3 @@ Rayfield:Notify({
    Duration = 4.5,
    Image = nil,
 })
-
