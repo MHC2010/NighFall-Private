@@ -17,7 +17,7 @@ local Window = Rayfield:CreateWindow({
 
     Discord = {
         Enabled = true,
-        Invite = "NauJg2aT", -- Correct Discord Invite
+        Invite = "NauJg2aT",
         RememberJoins = true
     },
 
@@ -29,7 +29,7 @@ local Window = Rayfield:CreateWindow({
         FileName = "NIGHTFALL_KEY",
         SaveKey = true,
         GrabKeyFromSite = true,
-        Key = {"https://pastebin.com/raw/wZS2224n"} -- Correct Key URL
+        Key = {"https://pastebin.com/raw/wZS2224n"}
     },
 
     CustomTheme = {
@@ -43,11 +43,11 @@ local Window = Rayfield:CreateWindow({
 })
 
 -- Create Tabs and Sections
-local MainTab = Window:CreateTab("🏠Home", nil)
+local MainTab = Window:CreateTab("\ud83c\udfe0Home", nil)
 local MainSection = MainTab:CreateSection("Main")
 
 -- Add a new tab for player management
-local PlayerTab = Window:CreateTab("🧑Players", nil)
+local PlayerTab = Window:CreateTab("\ud83e\uddd1Players", nil)
 local PlayerSection = PlayerTab:CreateSection("Player List")
 
 -- Store selected player
